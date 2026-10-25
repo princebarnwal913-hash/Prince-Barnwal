@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="hi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -11,11 +11,11 @@
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Yatra+One&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
 
   <style>
     /* ===================================================
-       CSS RESET & VARIABLES
+       RESET & THEME
        =================================================== */
     *, *::before, *::after {
       margin: 0;
@@ -26,17 +26,16 @@
 
     :root {
       --bg-gradient: linear-gradient(135deg, #ffe5ec 0%, #fcd5ce 25%, #f8edeb 50%, #e8d7f1 75%, #d8bbff 100%);
-      --primary-pink: #ff5c8a;
+      --primary-pink: #ff4d6d;
       --deep-pink: #d90429;
       --soft-pink: #ffb3c6;
-      --card-bg: rgba(255, 255, 255, 0.78);
-      --glass-border: rgba(255, 255, 255, 0.9);
-      --shadow-soft: 0 12px 35px rgba(255, 92, 138, 0.2);
-      --shadow-glow: 0 0 25px rgba(255, 92, 138, 0.45);
-      --font-cursive: 'Dancing Script', 'Caveat', cursive;
+      --card-bg: rgba(255, 255, 255, 0.9);
+      --glass-border: rgba(255, 255, 255, 0.95);
+      --shadow-soft: 0 14px 40px rgba(255, 77, 109, 0.22);
+      --font-cursive: 'Dancing Script', cursive;
       --font-body: 'Quicksand', sans-serif;
-      --text-dark: #4a2838;
-      --text-muted: #7d5a6a;
+      --font-hindi: 'Yatra One', cursive, sans-serif;
+      --text-dark: #3a1d28;
     }
 
     body {
@@ -53,7 +52,7 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 1.25rem;
+      padding: 1rem;
     }
 
     @keyframes gradientShift {
@@ -62,35 +61,24 @@
       100% { background-position: 0% 50%; }
     }
 
-    /* Ambient Canvas for sparkles & hearts */
-    #ambientCanvas {
+    #ambientCanvas, #confettiCanvas {
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      z-index: 1;
     }
-
-    /* Celebration Canvas for Heart Confetti */
-    #confettiCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: 90;
-    }
+    #ambientCanvas { z-index: 1; }
+    #confettiCanvas { z-index: 90; }
 
     /* ===================================================
-       FLOATING MUSIC PLAYER CONTROLLER
+       MUSIC PLAYER
        =================================================== */
     .music-widget {
       position: fixed;
-      top: 1rem;
-      right: 1rem;
+      top: 0.8rem;
+      right: 0.8rem;
       z-index: 100;
       display: flex;
       flex-direction: column;
@@ -98,32 +86,25 @@
     }
 
     .music-toggle-btn {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border: 2px solid var(--soft-pink);
-      color: var(--primary-pink);
+      color: var(--deep-pink);
       border-radius: 50px;
-      padding: 0.55rem 1rem;
+      padding: 0.5rem 0.9rem;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.4rem;
       cursor: pointer;
-      font-family: var(--font-body);
       font-weight: 700;
       font-size: 0.85rem;
       box-shadow: var(--shadow-soft);
       backdrop-filter: blur(10px);
-      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-
-    .music-toggle-btn:hover {
-      transform: scale(1.05);
-      box-shadow: var(--shadow-glow);
+      transition: all 0.3s ease;
     }
 
     .music-disc {
       display: inline-block;
       animation: spin 3s linear infinite paused;
-      font-size: 1.1rem;
     }
 
     .music-playing .music-disc {
@@ -138,26 +119,20 @@
       position: absolute;
       top: 110%;
       right: 0;
-      width: 260px;
-      background: rgba(255, 255, 255, 0.95);
+      width: 250px;
+      background: rgba(255, 255, 255, 0.96);
       border: 1px solid var(--glass-border);
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
-      border-radius: 18px;
-      padding: 1rem;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+      border-radius: 16px;
+      padding: 0.85rem;
       backdrop-filter: blur(15px);
       display: none;
       flex-direction: column;
-      gap: 0.65rem;
-      animation: dropFade 0.25s ease-out forwards;
+      gap: 0.6rem;
     }
 
     .music-dropdown.active {
       display: flex;
-    }
-
-    @keyframes dropFade {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .track-title {
@@ -165,9 +140,6 @@
       font-weight: 700;
       color: var(--deep-pink);
       text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
     }
 
     .audio-controls-row {
@@ -189,20 +161,6 @@
       justify-content: center;
       cursor: pointer;
       font-size: 0.95rem;
-      transition: transform 0.2s, background 0.2s;
-    }
-
-    .ctrl-icon-btn:hover {
-      background: var(--primary-pink);
-      color: #fff;
-      transform: scale(1.08);
-    }
-
-    .progress-bar-container {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 0.25rem;
     }
 
     .music-slider {
@@ -212,7 +170,6 @@
       border-radius: 5px;
       background: #ffd3e0;
       outline: none;
-      cursor: pointer;
     }
 
     .music-slider::-webkit-slider-thumb {
@@ -222,31 +179,52 @@
       border-radius: 50%;
       background: var(--primary-pink);
       cursor: pointer;
-      box-shadow: 0 0 5px rgba(255, 92, 138, 0.5);
     }
 
     .time-info {
       display: flex;
       justify-content: space-between;
       font-size: 0.72rem;
-      color: var(--text-muted);
+      color: #7d5a6a;
       font-weight: 600;
     }
 
-    .vol-row {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      font-size: 0.8rem;
+    /* Floating tap tip */
+    .tap-music-tip {
+      position: fixed;
+      top: 3.8rem;
+      right: 0.8rem;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1.5px solid var(--soft-pink);
+      color: var(--deep-pink);
+      font-size: 0.76rem;
+      font-weight: 700;
+      padding: 0.35rem 0.75rem;
+      border-radius: 20px;
+      z-index: 99;
+      box-shadow: 0 4px 15px rgba(255, 77, 109, 0.2);
+      animation: pulseTip 1.5s infinite;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
     }
 
-    /* Toast message for audio status */
+    @keyframes pulseTip {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.05); opacity: 1; }
+    }
+
+    .tap-music-tip.hide {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    /* Toast */
     .toast {
       position: fixed;
       bottom: 1.5rem;
       left: 50%;
       transform: translateX(-50%) translateY(100px);
-      background: rgba(255, 255, 255, 0.95);
+      background: rgba(255, 255, 255, 0.96);
       color: var(--text-dark);
       border-left: 5px solid var(--primary-pink);
       padding: 0.75rem 1.25rem;
@@ -256,7 +234,7 @@
       font-weight: 600;
       z-index: 200;
       opacity: 0;
-      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      transition: all 0.4s ease;
       max-width: 90%;
       text-align: center;
     }
@@ -267,7 +245,7 @@
     }
 
     /* ===================================================
-       MAIN CONTAINER & LAYOUT
+       CONTAINER & SCREENS
        =================================================== */
     .container {
       position: relative;
@@ -283,16 +261,9 @@
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
       border: 2px solid var(--glass-border);
-      border-radius: 30px;
-      padding: 2.2rem 1.6rem;
+      border-radius: 28px;
+      padding: 2rem 1.4rem;
       box-shadow: var(--shadow-soft);
-      transition: transform 0.4s ease, opacity 0.4s ease;
-    }
-
-    /* Screens transition */
-    .screen {
-      display: block;
-      transition: opacity 0.5s ease;
     }
 
     .screen.hidden {
@@ -300,74 +271,53 @@
       opacity: 0;
     }
 
-    /* ===================================================
-       PROPOSAL SCREEN
-       =================================================== */
+    /* Mascot Teddy */
     .cute-bear-box {
-      width: 140px;
-      height: 140px;
-      margin: 0 auto 1.2rem;
-      position: relative;
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 1rem;
     }
 
     .bear-svg {
       width: 100%;
       height: 100%;
-      filter: drop-shadow(0 6px 12px rgba(255, 92, 138, 0.25));
+      filter: drop-shadow(0 6px 12px rgba(255, 77, 109, 0.25));
       animation: floatTeddy 3s ease-in-out infinite;
     }
 
     @keyframes floatTeddy {
-      0%, 100% { transform: translateY(0) rotate(0deg); }
-      50% { transform: translateY(-7px) rotate(2deg); }
-    }
-
-    .pulse-heart {
-      animation: heartBeating 1.2s ease-in-out infinite;
-      transform-origin: center;
-    }
-
-    @keyframes heartBeating {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.15); }
-    }
-
-    .title-box {
-      margin-bottom: 1.2rem;
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-7px); }
     }
 
     .main-heading {
       font-family: var(--font-cursive);
-      font-size: clamp(2.4rem, 8vw, 3.2rem);
-      line-height: 1.15;
+      font-size: clamp(2.3rem, 8vw, 3.1rem);
       color: var(--deep-pink);
-      text-shadow: 0 2px 10px rgba(255, 92, 138, 0.25);
     }
 
     .sub-heading {
-      font-size: clamp(1.25rem, 5vw, 1.65rem);
+      font-size: clamp(1.2rem, 5vw, 1.55rem);
       font-weight: 700;
       color: #63324d;
-      margin-top: 0.35rem;
+      margin-top: 0.3rem;
     }
 
     .playful-message {
       min-height: 2.6rem;
-      font-size: 0.98rem;
-      font-weight: 600;
+      font-size: 0.95rem;
+      font-weight: 700;
       color: var(--deep-pink);
       margin: 0.6rem 0 1rem;
-      padding: 0.3rem 0.8rem;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: all 0.2s ease;
     }
 
     .buttons-arena {
       position: relative;
       width: 100%;
-      min-height: 120px;
+      min-height: 110px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -376,203 +326,189 @@
     }
 
     .btn {
-      position: relative;
       border: none;
-      outline: none;
       cursor: pointer;
-      font-family: var(--font-body);
       font-weight: 700;
       font-size: 1.1rem;
-      padding: 0.9rem 2.2rem;
+      padding: 0.85rem 2.2rem;
       border-radius: 50px;
-      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background 0.2s ease;
+      transition: transform 0.25s ease, box-shadow 0.2s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 0.5rem;
-      user-select: none;
     }
 
-    .btn:active {
-      transform: scale(0.95);
-    }
+    .btn:active { transform: scale(0.95); }
 
     .btn-yes {
       background: linear-gradient(135deg, #ff4d6d, #ff758f);
-      color: #ffffff;
+      color: #fff;
       box-shadow: 0 8px 25px rgba(255, 77, 109, 0.45);
       z-index: 5;
-    }
-
-    .btn-yes:hover {
-      transform: scale(1.08);
-      box-shadow: 0 12px 30px rgba(255, 77, 109, 0.6);
     }
 
     .btn-no {
       background: #ffffff;
       color: #6a4c58;
       border: 2px solid #fbc4d4;
-      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
-      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.2s ease, top 0.2s ease;
       z-index: 4;
       white-space: nowrap;
     }
 
-    .btn-no:hover {
-      background: #fff5f8;
-      color: var(--deep-pink);
-    }
-
     /* ===================================================
-       CELEBRATION & LOVE LETTER SCREEN
+       CELEBRATION SCREEN
        =================================================== */
     .celebration-title {
       font-family: var(--font-cursive);
-      font-size: clamp(2.2rem, 7vw, 3rem);
+      font-size: clamp(2.2rem, 7vw, 2.9rem);
       color: var(--deep-pink);
-      margin-bottom: 0.5rem;
-      animation: popUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-bottom: 0.2rem;
     }
 
-    @keyframes popUp {
-      0% { transform: scale(0.5); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+    .love-decor-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      margin: 0.8rem 0 1rem;
     }
 
-    /* Envelope 3D Container */
+    .rose-decor {
+      font-size: 1.9rem;
+      display: inline-block;
+      animation: roseSway 2.5s ease-in-out infinite alternate;
+      transform-origin: bottom center;
+    }
+
+    .rose-right {
+      animation-delay: 1.2s;
+    }
+
+    @keyframes roseSway {
+      0% { transform: rotate(-10deg) scale(0.95); }
+      100% { transform: rotate(14deg) scale(1.08); }
+    }
+
+    .dhak-dhak-heart {
+      font-size: 2.3rem;
+      display: inline-block;
+      animation: dhakDhak 0.85s ease-in-out infinite;
+      filter: drop-shadow(0 0 10px rgba(255, 0, 70, 0.4));
+    }
+
+    @keyframes dhakDhak {
+      0% { transform: scale(1); }
+      15% { transform: scale(1.28); }
+      30% { transform: scale(1.05); }
+      45% { transform: scale(1.24); }
+      60% { transform: scale(1); }
+      100% { transform: scale(1); }
+    }
+
     .envelope-wrapper {
       position: relative;
       width: 100%;
-      max-width: 320px;
-      margin: 1.5rem auto;
-      perspective: 1000px;
+      max-width: 340px;
+      margin: 0.5rem auto 1.5rem;
     }
 
     .envelope {
       position: relative;
       width: 100%;
-      height: 190px;
-      background: #f77f9e;
-      border-radius: 0 0 16px 16px;
-      box-shadow: 0 15px 35px rgba(217, 4, 41, 0.25);
-      cursor: pointer;
-      transition: transform 0.3s ease;
+      background: #ff5c8a;
+      border-radius: 18px;
+      padding: 1.2rem 0.9rem;
+      box-shadow: 0 15px 35px rgba(217, 4, 41, 0.22);
     }
 
-    /* Envelope Flap */
-    .envelope::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 0;
-      height: 0;
-      border-left: 160px solid transparent;
-      border-right: 160px solid transparent;
-      border-top: 100px solid #ff5c8a;
-      transform-origin: top;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      z-index: 3;
-    }
-
-    /* Envelope Pocket Front */
-    .envelope-pocket {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0;
-      height: 0;
-      border-left: 160px solid #ffa3ba;
-      border-right: 160px solid #ffa3ba;
-      border-bottom: 95px solid #ff8fa3;
-      border-radius: 0 0 16px 16px;
-      z-index: 4;
-      pointer-events: none;
-    }
-
-    /* Envelope Seal Heart */
-    .envelope-seal {
-      position: absolute;
-      top: 80px;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 2rem;
-      z-index: 5;
-      transition: opacity 0.4s ease, transform 0.4s ease;
-      cursor: pointer;
-    }
-
-    /* Love Letter Paper */
     .letter-paper {
-      position: absolute;
-      top: 10px;
-      left: 12px;
-      right: 12px;
-      background: #fffdfa;
-      background-image: repeating-linear-gradient(transparent, transparent 27px, #f7d2dc 28px);
-      padding: 1.5rem 1.1rem;
-      border-radius: 12px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-      font-size: 0.95rem;
-      line-height: 1.6;
-      color: #4a2838;
+      background: #fffdf7;
+      border-radius: 14px;
+      padding: 1.4rem 1.1rem;
+      box-shadow: inset 0 0 12px rgba(255, 179, 198, 0.3), 0 5px 15px rgba(0,0,0,0.06);
+      border: 1px solid #ffd6e0;
       text-align: left;
-      z-index: 2;
-      transition: transform 0.8s cubic-bezier(0.34, 1.25, 0.64, 1), z-index 0.2s ease 0.3s;
-      max-height: 380px;
-      overflow-y: auto;
     }
 
     .letter-paper h3 {
       font-family: var(--font-cursive);
-      font-size: 1.8rem;
+      font-size: 1.85rem;
       color: var(--deep-pink);
-      margin-bottom: 0.6rem;
+      text-align: center;
+      margin-bottom: 0.9rem;
     }
 
-    .letter-paper p {
-      margin-bottom: 0.75rem;
-      font-size: 0.92rem;
+    .lyric-line {
+      font-family: var(--font-hindi);
+      font-size: 1.02rem;
+      line-height: 1.9;
+      color: #50313f;
+      margin-bottom: 0.85rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .lyric-word {
+      position: relative;
+      display: inline-block;
+      padding-bottom: 2px;
+      transition: color 0.2s ease, transform 0.2s ease;
+    }
+
+    .lyric-word::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      height: 2.8px;
+      background: var(--deep-pink);
+      border-radius: 2px;
+      transition: width 0.25s ease;
+    }
+
+    .lyric-word.active {
+      color: var(--deep-pink);
+      font-weight: 700;
+      transform: translateY(-1.5px);
+    }
+
+    .lyric-word.active::after,
+    .lyric-word.passed::after {
+      width: 100%;
+    }
+
+    .line-emoji {
+      font-size: 1.2rem;
+      margin-left: 0.2rem;
+      display: inline-block;
+      animation: miniBounce 1.5s ease-in-out infinite;
+    }
+
+    @keyframes miniBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
     }
 
     .letter-sign {
       font-family: var(--font-cursive);
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       color: var(--deep-pink);
       text-align: right;
-      margin-top: 0.8rem;
-    }
-
-    /* Open State */
-    .envelope-wrapper.open .envelope::before {
-      transform: rotateX(180deg);
-      z-index: 1;
-    }
-
-    .envelope-wrapper.open .envelope-seal {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.3);
-      pointer-events: none;
-    }
-
-    .envelope-wrapper.open .letter-paper {
-      transform: translateY(-130px);
-      z-index: 6;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+      margin-top: 1rem;
     }
 
     .celebration-actions {
-      margin-top: 150px;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem;
+      gap: 0.7rem;
       align-items: center;
-      transition: margin-top 0.4s ease;
     }
 
     .secondary-btn {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border: 2px solid var(--soft-pink);
       color: var(--deep-pink);
       font-weight: 700;
@@ -581,65 +517,26 @@
       cursor: pointer;
       font-family: var(--font-body);
       font-size: 0.95rem;
-      transition: all 0.3s ease;
       box-shadow: var(--shadow-soft);
       display: inline-flex;
       align-items: center;
       gap: 0.4rem;
+      transition: all 0.3s ease;
     }
 
     .secondary-btn:hover {
       background: #fff;
       transform: translateY(-2px);
-      box-shadow: var(--shadow-glow);
-    }
-
-    /* ===================================================
-       ACCESSIBILITY & REDUCED MOTION
-       =================================================== */
-    @media (prefers-reduced-motion: reduce) {
-      body, .bear-svg, .pulse-heart, .music-disc {
-        animation: none !important;
-      }
-      .letter-paper, .envelope::before, .btn {
-        transition: none !important;
-      }
-    }
-
-    /* ===================================================
-       RESPONSIVE ADJUSTMENTS
-       =================================================== */
-    @media (max-width: 400px) {
-      .card {
-        padding: 1.7rem 1.1rem;
-      }
-      .envelope-wrapper {
-        max-width: 280px;
-      }
-      .envelope::before, .envelope-pocket {
-        border-left-width: 140px;
-        border-right-width: 140px;
-      }
-      .main-heading {
-        font-size: 2.2rem;
-      }
-      .btn {
-        padding: 0.8rem 1.6rem;
-        font-size: 1rem;
-      }
     }
   </style>
 </head>
 <body>
 
-  <!-- Background Animated Canvas (Hearts & Sparkles) -->
   <canvas id="ambientCanvas"></canvas>
-
-  <!-- Celebration Heart Confetti Canvas -->
   <canvas id="confettiCanvas"></canvas>
 
   <!-- ===================================================
-       AUDIO PLAYER (Hardcoded to assets/my-love-song.mp3)
+       AUDIO PLAYER (assets/my-love-song.mp3)
        =================================================== -->
   <audio id="loveAudio" preload="auto">
     <source src="assets/my-love-song.mp3" type="audio/mpeg" />
@@ -648,81 +545,130 @@
   </audio>
 
   <div class="music-widget">
-    <button class="music-toggle-btn" id="musicToggleBtn" aria-label="Toggle background music player menu">
+    <button class="music-toggle-btn" id="musicToggleBtn" aria-label="Toggle song controls">
       <span class="music-disc">🎵</span>
       <span id="musicBtnLabel">Our Song</span>
     </button>
 
-    <!-- Floating Audio Control Panel -->
     <div class="music-dropdown" id="musicDropdown">
-      <div class="track-title" id="trackNameDisplay">Our Romantic Song 💖</div>
+      <div class="track-title">Aaj Se Teri 💖</div>
       
       <div class="audio-controls-row">
-        <button class="ctrl-icon-btn" id="playPauseBtn" aria-label="Play or Pause Song">▶</button>
-        <button class="ctrl-icon-btn" id="muteBtn" aria-label="Mute or Unmute Song">🔊</button>
+        <button class="ctrl-icon-btn" id="playPauseBtn" aria-label="Play or Pause">▶</button>
+        <button class="ctrl-icon-btn" id="muteBtn" aria-label="Mute">🔊</button>
       </div>
 
-      <div class="progress-bar-container">
-        <input type="range" class="music-slider" id="progressSlider" value="0" min="0" max="100" step="0.1" aria-label="Song progress" />
+      <div>
+        <input type="range" class="music-slider" id="progressSlider" value="0" min="0" max="100" step="0.1" />
         <div class="time-info">
-          <span id="currentTime">0:00</span>
-          <span id="totalDuration">0:00</span>
+          <span id="currentTime">0:18</span>
+          <span id="totalDuration">5:12</span>
         </div>
       </div>
 
-      <div class="vol-row">
+      <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.8rem;">
         <span>🔉</span>
-        <input type="range" class="music-slider" id="volumeSlider" value="75" min="0" max="100" aria-label="Volume slider" />
+        <input type="range" class="music-slider" id="volumeSlider" value="85" min="0" max="100" />
       </div>
     </div>
   </div>
 
-  <!-- Friendly Toast Notice -->
+  <div class="tap-music-tip" id="tapMusicTip">🎵 Tap anywhere to play</div>
   <div class="toast" id="userToast"></div>
 
   <!-- ===================================================
-       MAIN CONTENT CONTAINER
+       MAIN PROPOSAL SCREEN
        =================================================== -->
   <main class="container">
     <div class="card">
 
-      <!-- ===============================================
-           PROPOSAL SCREEN
-           =============================================== -->
       <section class="screen" id="proposalScreen">
-        
-        <!-- SVG Teddy Bear Illustration -->
         <div class="cute-bear-box" aria-hidden="true">
           <svg class="bear-svg" viewBox="0 0 120 120">
-            <!-- Ears -->
             <circle cx="32" cy="30" r="14" fill="#bb855a"/>
             <circle cx="32" cy="30" r="8" fill="#fbb1bd"/>
             <circle cx="88" cy="30" r="14" fill="#bb855a"/>
             <circle cx="88" cy="30" r="8" fill="#fbb1bd"/>
-            
-            <!-- Head -->
             <ellipse cx="60" cy="50" rx="36" ry="30" fill="#c9956d"/>
-            
-            <!-- Eyes -->
             <circle cx="48" cy="46" r="3.5" fill="#2d1e18"/>
             <circle cx="72" cy="46" r="3.5" fill="#2d1e18"/>
-            <circle cx="49.5" cy="44.5" r="1.2" fill="#ffffff"/>
-            <circle cx="73.5" cy="44.5" r="1.2" fill="#ffffff"/>
-
-            <!-- Blush Cheeks -->
+            <circle cx="49.5" cy="44.5" r="1.2" fill="#fff"/>
+            <circle cx="73.5" cy="44.5" r="1.2" fill="#fff"/>
             <ellipse cx="42" cy="54" rx="5" ry="3" fill="#ff99aa" opacity="0.6"/>
             <ellipse cx="78" cy="54" rx="5" ry="3" fill="#ff99aa" opacity="0.6"/>
-
-            <!-- Snout & Nose -->
             <ellipse cx="60" cy="54" rx="11" ry="8" fill="#fce4d6"/>
             <polygon points="60,51 56,47 64,47" fill="#4a2e1b"/>
             <path d="M57 54 Q60 57 63 54" stroke="#4a2e1b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-
-            <!-- Body -->
             <ellipse cx="60" cy="85" rx="32" ry="26" fill="#c9956d"/>
-            
-            <!-- Feet -->
             <ellipse cx="40" cy="106" rx="10" ry="7" fill="#bb855a"/>
             <ellipse cx="80" cy="106" rx="10" ry="7" fill="#bb855a"/>
             <circle cx="40" cy="106" r="4" fill="#fbb1bd"/>
-           
+            <circle cx="80" cy="106" r="4" fill="#fbb1bd"/>
+            <path d="M60 72 C55 63, 40 65, 45 78 C50 88, 60 95, 60 95 C60 95, 70 88, 75 78 C80 65, 65 63, 60 72 Z" fill="#ff3366"/>
+            <circle cx="47" cy="81" r="6" fill="#bb855a"/>
+            <circle cx="73" cy="81" r="6" fill="#bb855a"/>
+          </svg>
+        </div>
+
+        <div>
+          <h1 class="main-heading">I Love You ❤️</h1>
+          <h2 class="sub-heading">Will You Be My Girlfriend? 💖</h2>
+        </div>
+
+        <p class="playful-message" id="playfulMessage" aria-live="polite"></p>
+
+        <div class="buttons-arena" id="buttonArea">
+          <button class="btn btn-yes" id="btnYes">YES 💖</button>
+          <button class="btn btn-no" id="btnNo">NO 🙈</button>
+        </div>
+      </section>
+
+      <!-- CELEBRATION & SYNCED LYRICS SCREEN -->
+      <section class="screen hidden" id="celebrationScreen">
+        
+        <h2 class="celebration-title">You made my day! 💕</h2>
+
+        <div class="love-decor-bar">
+          <span class="rose-decor">🌹</span>
+          <span class="dhak-dhak-heart">💖</span>
+          <span class="rose-decor rose-right">🌹</span>
+        </div>
+
+        <div class="envelope-wrapper">
+          <div class="envelope">
+            <article class="letter-paper">
+              <h3>For You, My Love 💌</h3>
+
+              <div class="lyric-line" id="line1">
+                <span class="lyric-word" data-start="1.8" data-end="2.4">तेरे</span>
+                <span class="lyric-word" data-start="2.5" data-end="3.2">माथे</span>
+                <span class="lyric-word" data-start="3.3" data-end="3.7">के</span>
+                <span class="lyric-word" data-start="3.8" data-end="4.6">कुमकुम</span>
+                <span class="lyric-word" data-start="4.7" data-end="5.0">को,</span>
+                <span class="lyric-word" data-start="5.1" data-end="5.5">मैं</span>
+                <span class="lyric-word" data-start="5.6" data-end="6.0">तिलक</span>
+                <span class="lyric-word" data-start="6.1" data-end="6.6">लगाके</span>
+                <span class="lyric-word" data-start="6.7" data-end="7.7">घूमूँगा</span>
+                <span class="line-emoji">✨❤️</span>
+              </div>
+
+              <div class="lyric-line" id="line2">
+                <span class="lyric-word" data-start="7.8" data-end="8.4">तेरी</span>
+                <span class="lyric-word" data-start="8.5" data-end="9.2">बाली</span>
+                <span class="lyric-word" data-start="9.3" data-end="9.6">की</span>
+                <span class="lyric-word" data-start="9.7" data-end="10.8">छुन-छुन</span>
+                <span class="lyric-word" data-start="10.9" data-end="11.2">को,</span>
+                <span class="lyric-word" data-start="11.3" data-end="11.6">मैं</span>
+                <span class="lyric-word" data-start="11.7" data-end="12.0">दिल</span>
+                <span class="lyric-word" data-start="12.1" data-end="12.4">से</span>
+                <span class="lyric-word" data-start="12.5" data-end="13.0">लगाके</span>
+                <span class="lyric-word" data-start="13.1" data-end="14.0">झूमूँगा</span>
+                <span class="line-emoji">💃💍</span>
+              </div>
+
+              <div class="lyric-line" id="line3">
+                <span class="lyric-word" data-start="14.2" data-end="14.9">मेरी</span>
+                <span class="lyric-word" data-start="15.0" data-end="15.8">छोटी</span>
+                <span class="lyric-word" data-start="15.9" data-end="16.2">सी</span>
+                <span class="lyric-word" data-start="16.3" data-end="17.2">भूलों</span>
+                <span
