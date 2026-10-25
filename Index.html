@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>A Little Question for You ❤️</title>
+
+  <!-- SVG Heart Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💖</text></svg>" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Dancing+Script:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ===================================================
+       CSS RESET & VARIABLES
+       =================================================== */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    :root {
+      --bg-gradient: linear-gradient(135deg, #ffe5ec 0%, #fcd5ce 25%, #f8edeb 50%, #e8d7f1 75%, #d8bbff 100%);
+      --primary-pink: #ff5c8a;
+      --deep-pink: #d90429;
+      --soft-pink: #ffb3c6;
+      --card-bg: rgba(255, 255, 255, 0.78);
+      --glass-border: rgba(255, 255, 255, 0.9);
+      --shadow-soft: 0 12px 35px rgba(255, 92, 138, 0.2);
+      --shadow-glow: 0 0 25px rgba(255, 92, 138, 0.45);
+      --font-cursive: 'Dancing Script', 'Caveat', cursive;
+      --font-body: 'Quicksand', sans-serif;
+      --text-dark: #4a2838;
+      --text-muted: #7d5a6a;
+    }
+
+    body {
+      font-family: var(--font-body);
+      min-height: 100vh;
+      min-height: 100dvh;
+      background: var(--bg-gradient);
+      background-size: 300% 300%;
+      animation: gradientShift 14s ease infinite;
+      color: var(--text-dark);
+      overflow-x: hidden;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* Ambient Canvas for sparkles & hearts */
+    #ambientCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Celebration Canvas for Heart Confetti */
+    #confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 90;
+    }
+
+    /* ===================================================
+       FLOATING MUSIC PLAYER CONTROLLER
+       =================================================== */
+    .music-widget {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .music-toggle-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid var(--soft-pink);
+      color: var(--primary-pink);
+      border-radius: 50px;
+      padding: 0.55rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(10px);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .music-toggle-btn:hover {
+      transform: scale(1.05);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .music-disc {
+      display: inline-block;
+      animation: spin 3s linear infinite paused;
+      font-size: 1.1rem;
+    }
+
+    .music-playing .music-disc {
+      animation-play-state: running;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    .music-dropdown {
+      position: absolute;
+      top: 110%;
+      right: 0;
+      width: 260px;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--glass-border);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.12);
+      border-radius: 18px;
+      padding: 1rem;
+      backdrop-filter: blur(15px);
+      display: none;
+      flex-direction: column;
+      gap: 0.65rem;
+      animation: dropFade 0.25s ease-out forwards;
+    }
+
+    .music-dropdown.active {
+      display: flex;
+    }
+
+    @keyframes dropFade {
+      from { opacity: 0; transform: translateY(-8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .track-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--deep-pink);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .audio-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.8rem;
+    }
+
+    .ctrl-icon-btn {
+      background: #ffe3ec;
+      border: none;
+      color: var(--primary-pink);
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.95rem;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .ctrl-icon-btn:hover {
+      background: var(--primary-pink);
+      color: #fff;
+      transform: scale(1.08);
+    }
+
+    .progress-bar-container {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .music-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 5px;
+      background: #ffd3e0;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .music-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--primary-pink);
+      cursor: pointer;
+      box-shadow: 0 0 5px rgba(255, 92, 138, 0.5);
+    }
+
+    .time-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .vol-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    /* Toast message for audio status */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: rgba(255, 255, 255, 0.95);
+      color: var(--text-dark);
+      border-left: 5px solid var(--primary-pink);
+      padding: 0.75rem 1.25rem;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+      font-size: 0.85rem;
+      font-weight: 600;
+      z-index: 200;
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      max-width: 90%;
+      text-align: center;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    /* ===================================================
+       MAIN CONTAINER & LAYOUT
+       =================================================== */
+    .container {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      margin: auto;
+      text-align: center;
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 2px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 2.2rem 1.6rem;
+      box-shadow: var(--shadow-soft);
+      transition: transform 0.4s ease, opacity 0.4s ease;
+    }
+
+    /* Screens transition */
+    .screen {
+      display: block;
+      transition: opacity 0.5s ease;
+    }
+
+    .screen.hidden {
+      display: none;
+      opacity: 0;
+    }
+
+    /* ===================================================
+       PROPOSAL SCREEN
+       =================================================== */
+    .cute-bear-box {
+      width: 140px;
+      height: 140px;
+      margin: 0 auto 1.2rem;
+      position: relative;
+    }
+
+    .bear-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 6px 12px rgba(255, 92, 138, 0.25));
+      animation: floatTeddy 3s ease-in-out infinite;
+    }
+
+    @keyframes floatTeddy {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      50% { transform: translateY(-7px) rotate(2deg); }
+    }
+
+    .pulse-heart {
+      animation: heartBeating 1.2s ease-in-out infinite;
+      transform-origin: center;
+    }
+
+    @keyframes heartBeating {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+    }
+
+    .title-box {
+      margin-bottom: 1.2rem;
+    }
+
+    .main-heading {
+      font-family: var(--font-cursive);
+      font-size: clamp(2.4rem, 8vw, 3.2rem);
+      line-height: 1.15;
+      color: var(--deep-pink);
+      text-shadow: 0 2px 10px rgba(255, 92, 138, 0.25);
+    }
+
+    .sub-heading {
+      font-size: clamp(1.25rem, 5vw, 1.65rem);
+      font-weight: 700;
+      color: #63324d;
+      margin-top: 0.35rem;
+    }
+
+    .playful-message {
+      min-height: 2.6rem;
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--deep-pink);
+      margin: 0.6rem 0 1rem;
+      padding: 0.3rem 0.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .buttons-arena {
+      position: relative;
+      width: 100%;
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1.2rem;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      position: relative;
+      border: none;
+      outline: none;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.9rem 2.2rem;
+      border-radius: 50px;
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.25s ease, background 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.95);
+    }
+
+    .btn-yes {
+      background: linear-gradient(135deg, #ff4d6d, #ff758f);
+      color: #ffffff;
+      box-shadow: 0 8px 25px rgba(255, 77, 109, 0.45);
+      z-index: 5;
+    }
+
+    .btn-yes:hover {
+      transform: scale(1.08);
+      box-shadow: 0 12px 30px rgba(255, 77, 109, 0.6);
+    }
+
+    .btn-no {
+      background: #ffffff;
+      color: #6a4c58;
+      border: 2px solid #fbc4d4;
+      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+      transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), left 0.2s ease, top 0.2s ease;
+      z-index: 4;
+      white-space: nowrap;
+    }
+
+    .btn-no:hover {
+      background: #fff5f8;
+      color: var(--deep-pink);
+    }
+
+    /* ===================================================
+       CELEBRATION & LOVE LETTER SCREEN
+       =================================================== */
+    .celebration-title {
+      font-family: var(--font-cursive);
+      font-size: clamp(2.2rem, 7vw, 3rem);
+      color: var(--deep-pink);
+      margin-bottom: 0.5rem;
+      animation: popUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes popUp {
+      0% { transform: scale(0.5); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Envelope 3D Container */
+    .envelope-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 320px;
+      margin: 1.5rem auto;
+      perspective: 1000px;
+    }
+
+    .envelope {
+      position: relative;
+      width: 100%;
+      height: 190px;
+      background: #f77f9e;
+      border-radius: 0 0 16px 16px;
+      box-shadow: 0 15px 35px rgba(217, 4, 41, 0.25);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    /* Envelope Flap */
+    .envelope::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 160px solid transparent;
+      border-right: 160px solid transparent;
+      border-top: 100px solid #ff5c8a;
+      transform-origin: top;
+      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 3;
+    }
+
+    /* Envelope Pocket Front */
+    .envelope-pocket {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 0;
+      border-left: 160px solid #ffa3ba;
+      border-right: 160px solid #ffa3ba;
+      border-bottom: 95px solid #ff8fa3;
+      border-radius: 0 0 16px 16px;
+      z-index: 4;
+      pointer-events: none;
+    }
+
+    /* Envelope Seal Heart */
+    .envelope-seal {
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      z-index: 5;
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      cursor: pointer;
+    }
+
+    /* Love Letter Paper */
+    .letter-paper {
+      position: absolute;
+      top: 10px;
+      left: 12px;
+      right: 12px;
+      background: #fffdfa;
+      background-image: repeating-linear-gradient(transparent, transparent 27px, #f7d2dc 28px);
+      padding: 1.5rem 1.1rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: #4a2838;
+      text-align: left;
+      z-index: 2;
+      transition: transform 0.8s cubic-bezier(0.34, 1.25, 0.64, 1), z-index 0.2s ease 0.3s;
+      max-height: 380px;
+      overflow-y: auto;
+    }
+
+    .letter-paper h3 {
+      font-family: var(--font-cursive);
+      font-size: 1.8rem;
+      color: var(--deep-pink);
+      margin-bottom: 0.6rem;
+    }
+
+    .letter-paper p {
+      margin-bottom: 0.75rem;
+      font-size: 0.92rem;
+    }
+
+    .letter-sign {
+      font-family: var(--font-cursive);
+      font-size: 1.4rem;
+      color: var(--deep-pink);
+      text-align: right;
+      margin-top: 0.8rem;
+    }
+
+    /* Open State */
+    .envelope-wrapper.open .envelope::before {
+      transform: rotateX(180deg);
+      z-index: 1;
+    }
+
+    .envelope-wrapper.open .envelope-seal {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.3);
+      pointer-events: none;
+    }
+
+    .envelope-wrapper.open .letter-paper {
+      transform: translateY(-130px);
+      z-index: 6;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.18);
+    }
+
+    .celebration-actions {
+      margin-top: 150px;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      align-items: center;
+      transition: margin-top 0.4s ease;
+    }
+
+    .secondary-btn {
+      background: rgba(255, 255, 255, 0.9);
+      border: 2px solid var(--soft-pink);
+      color: var(--deep-pink);
+      font-weight: 700;
+      padding: 0.75rem 1.6rem;
+      border-radius: 50px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-soft);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .secondary-btn:hover {
+      background: #fff;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-glow);
+    }
+
+    /* ===================================================
+       ACCESSIBILITY & REDUCED MOTION
+       =================================================== */
+    @media (prefers-reduced-motion: reduce) {
+      body, .bear-svg, .pulse-heart, .music-disc {
+        animation: none !important;
+      }
+      .letter-paper, .envelope::before, .btn {
+        transition: none !important;
+      }
+    }
+
+    /* ===================================================
+       RESPONSIVE ADJUSTMENTS
+       =================================================== */
+    @media (max-width: 400px) {
+      .card {
+        padding: 1.7rem 1.1rem;
+      }
+      .envelope-wrapper {
+        max-width: 280px;
+      }
+      .envelope::before, .envelope-pocket {
+        border-left-width: 140px;
+        border-right-width: 140px;
+      }
+      .main-heading {
+        font-size: 2.2rem;
+      }
+      .btn {
+        padding: 0.8rem 1.6rem;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Background Animated Canvas (Hearts & Sparkles) -->
+  <canvas id="ambientCanvas"></canvas>
+
+  <!-- Celebration Heart Confetti Canvas -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- ===================================================
+       AUDIO PLAYER (Hardcoded to assets/my-love-song.mp3)
+       =================================================== -->
+  <audio id="loveAudio" preload="auto">
+    <source src="assets/my-love-song.mp3" type="audio/mpeg" />
+    <source src="assets/my-love-song.ogg" type="audio/ogg" />
+    <source src="assets/my-love-song.wav" type="audio/wav" />
+  </audio>
+
+  <div class="music-widget">
+    <button class="music-toggle-btn" id="musicToggleBtn" aria-label="Toggle background music player menu">
+      <span class="music-disc">🎵</span>
+      <span id="musicBtnLabel">Our Song</span>
+    </button>
+
+    <!-- Floating Audio Control Panel -->
+    <div class="music-dropdown" id="musicDropdown">
+      <div class="track-title" id="trackNameDisplay">Our Romantic Song 💖</div>
+      
+      <div class="audio-controls-row">
+        <button class="ctrl-icon-btn" id="playPauseBtn" aria-label="Play or Pause Song">▶</button>
+        <button class="ctrl-icon-btn" id="muteBtn" aria-label="Mute or Unmute Song">🔊</button>
+      </div>
+
+      <div class="progress-bar-container">
+        <input type="range" class="music-slider" id="progressSlider" value="0" min="0" max="100" step="0.1" aria-label="Song progress" />
+        <div class="time-info">
+          <span id="currentTime">0:00</span>
+          <span id="totalDuration">0:00</span>
+        </div>
+      </div>
+
+      <div class="vol-row">
+        <span>🔉</span>
+        <input type="range" class="music-slider" id="volumeSlider" value="75" min="0" max="100" aria-label="Volume slider" />
+      </div>
+    </div>
+  </div>
+
+  <!-- Friendly Toast Notice -->
+  <div class="toast" id="userToast"></div>
+
+  <!-- ===================================================
+       MAIN CONTENT CONTAINER
+       =================================================== -->
+  <main class="container">
+    <div class="card">
+
+      <!-- ===============================================
+           PROPOSAL SCREEN
+           =============================================== -->
+      <section class="screen" id="proposalScreen">
+        
+        <!-- SVG Teddy Bear Illustration -->
+        <div class="cute-bear-box" aria-hidden="true">
+          <svg class="bear-svg" viewBox="0 0 120 120">
+            <!-- Ears -->
+            <circle cx="32" cy="30" r="14" fill="#bb855a"/>
+            <circle cx="32" cy="30" r="8" fill="#fbb1bd"/>
+            <circle cx="88" cy="30" r="14" fill="#bb855a"/>
+            <circle cx="88" cy="30" r="8" fill="#fbb1bd"/>
+            
+            <!-- Head -->
+            <ellipse cx="60" cy="50" rx="36" ry="30" fill="#c9956d"/>
+            
+            <!-- Eyes -->
+            <circle cx="48" cy="46" r="3.5" fill="#2d1e18"/>
+            <circle cx="72" cy="46" r="3.5" fill="#2d1e18"/>
+            <circle cx="49.5" cy="44.5" r="1.2" fill="#ffffff"/>
+            <circle cx="73.5" cy="44.5" r="1.2" fill="#ffffff"/>
+
+            <!-- Blush Cheeks -->
+            <ellipse cx="42" cy="54" rx="5" ry="3" fill="#ff99aa" opacity="0.6"/>
+            <ellipse cx="78" cy="54" rx="5" ry="3" fill="#ff99aa" opacity="0.6"/>
+
+            <!-- Snout & Nose -->
+            <ellipse cx="60" cy="54" rx="11" ry="8" fill="#fce4d6"/>
+            <polygon points="60,51 56,47 64,47" fill="#4a2e1b"/>
+            <path d="M57 54 Q60 57 63 54" stroke="#4a2e1b" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+
+            <!-- Body -->
+            <ellipse cx="60" cy="85" rx="32" ry="26" fill="#c9956d"/>
+            
+            <!-- Feet -->
+            <ellipse cx="40" cy="106" rx="10" ry="7" fill="#bb855a"/>
+            <ellipse cx="80" cy="106" rx="10" ry="7" fill="#bb855a"/>
+            <circle cx="40" cy="106" r="4" fill="#fbb1bd"/>
+           
